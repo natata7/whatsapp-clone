@@ -1,8 +1,10 @@
 import React from 'react';
-import { useState, useMemo } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import moment from 'moment';
 import { List, ListItem } from '@material-ui/core';
 import styled from 'styled-components';
+import { History } from 'history';
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   height: calc(100% - 56px);
@@ -71,8 +73,17 @@ const getChatsQuery = `
   }
 `;
 
-const ChatsList = () => {
+interface ChatsListProps {
+  history: History;
+}
+
+interface Chat {
+  id: string,
+  lastMessage: object
+}
+const ChatsList: React.FC<ChatsListProps> = ({ history }) => {
   const [chats, setChats] = useState<any[]>([]);
+  let navigate = useNavigate();
 
   useMemo(async () => {
     const body = await fetch(`${process.env.REACT_APP_SERVER_URL}/graphql`, {
@@ -88,11 +99,22 @@ const ChatsList = () => {
     setChats(chats);
   }, []);
 
+  const navToChat = useCallback(
+    (chat: Chat) => {
+      navigate(`${chat.id}`);
+    },
+    [navigate]
+  );
+
   return (
     <Container>
       <StyledList>
         {chats.map((chat) => (
-          <StyledListItem key={chat!.id} button>
+          <StyledListItem
+          key={chat.id}
+          data-testid="chat"
+          button
+          onClick={navToChat.bind(null, chat)}>
             <ChatPicture src={chat.picture} alt="Profile" data-testid="picture" />
             <ChatInfo>
               <ChatName data-testid="name">{chat.name}</ChatName>

@@ -14,7 +14,6 @@ function App() {
       <Routes>
         <Route path="/chats" element={<ChatsListScreen />} />
         <Route
-          exact
           path="/chats/:chatId"
           element={
             <ChatRoomScreen />
